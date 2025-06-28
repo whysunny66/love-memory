@@ -751,7 +751,6 @@
                 <div class="main-photo">
                     <img id="main-photo" src="1.2.3/1.1.jpeg" alt="主照片">
                     <div class="photo-info" style="opacity: 1; transform: translateY(0); padding: 20px;">
-                        <div class="photo-date"><i class="fas fa-calendar-day"></i> </div>
                         <p>绿茶餐厅</p>
                     </div>
                 </div>
@@ -1021,9 +1020,6 @@
                 
                 gridItem.innerHTML = `
                     <img src="${photo.thumb}" alt="照片${index + 1}" loading="lazy">
-                    <div class="photo-info">
-                        <div class="photo-date"><i class="fas fa-calendar-day"></i> ${photo.date}</div>
-                    </div>
                 `;
                 
                 gridItem.addEventListener('click', function() {
