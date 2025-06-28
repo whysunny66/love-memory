@@ -882,7 +882,6 @@
                 if (jpgExists) {
                     return {
                         id: index,
-                        date: `2024-${Math.floor((index-1)/12)+1}-${(index%12 || 12).toString().padStart(2, '0')}`,
                         title: `回忆 ${index}`,
                         desc: `这是我们爱情故事中的第 ${index} 张照片`,
                         thumb: jpgUrl,
@@ -895,7 +894,6 @@
                 if (jpegExists) {
                     return {
                         id: index,
-                        date: `2024-${Math.floor((index-1)/12)+1}-${(index%12 || 12).toString().padStart(2, '0')}`,
                         title: `回忆 ${index}`,
                         desc: `这是我们爱情故事中的第 ${index} 张照片`,
                         thumb: jpegUrl,
@@ -1082,7 +1080,7 @@
                     if (document.querySelectorAll('.grid-item')[currentIndex]) {
                         document.querySelectorAll('.grid-item')[currentIndex].classList.add('active');
                     }
-                }, 3000); // 每5秒切换一次
+                }, 3000); // 每3秒切换一次
             }
             
             startAutoRotate();
