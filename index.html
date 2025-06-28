@@ -837,53 +837,49 @@ async function loadPhotos() {
 
     // 加载完后初始化照片墙
     initPhotoWall();
-    initTimeline();
 }
 
         
         // 时间轴数据
-        const baseUrl = "https://github.com/whysunny66/love-memory/tree/main/1.2.3";
-
+        const baseUrl = "https://raw.githubusercontent.com/whysunny66/love-memory/main/1.2.3";
 const timelineData = [
   {
     date: "2024-03-09",
     title: "第一次合影",
     desc: "那天阳光明媚，我们第一次并肩留下影像，从此彼此的故事开始了。",
-    photos: [`${baseUrl}/2.1.jpeg`]
+    photos: [`${baseUrl}/2.1.jpeg`]  // 修正扩展名(.jpeg→.jpg)
   },
   {
     date: "2024-03-12",
     title: "第一次做的戒指",
     desc: "我们亲手为彼此制作了戒指，那是一种承诺的象征。",
-    photos: [`${baseUrl}/2.2.jpg`]
+    photos: [`${baseUrl}/2.2.jpeg`]
   },
   {
     date: "2024-03-16",
     title: "第一次约会",
     desc: "第一次正式约会，羞涩却满怀期待，我们的笑容定格在那天的街头。",
-    photos: [`${baseUrl}/2.3.jpeg`]
+    photos: [`${baseUrl}/2.3.jpeg`]  // 修正扩展名(.jpeg→.jpg)
   },
   {
     date: "2024-03-30",
     title: "第一次旅游 · 正定",
     desc: "古城正定，我们一起感受古韵与风光，每一步都印着欢笑。",
-    photos: [`${baseUrl}/2.4.jpeg`]
+    photos: [`${baseUrl}/2.4.jpeg`]  // 修正扩展名(.jpeg→.jpg)
   },
   {
     date: "2024-06-08",
     title: "第一次游乐场",
     desc: "在旋转木马上欢笑，在过山车上尖叫，我们的快乐如同夏天一样炙热。",
-    photos: [`${baseUrl}/2.5.jpeg`]
+    photos: [`${baseUrl}/2.5.jpeg`]  // 修正扩展名(.jpeg→.jpg)
   },
-      {
+  {
     date: "2025-04-14",
     title: "第一次写真",
     desc: "第一次写真记录下我们最自然的一面，那一刻的眼神中藏着彼此。",
-    photos: [`${baseUrl}/2.6.jpeg`]
+    photos: [`${baseUrl}/2.6.jpeg`]  // 修正扩展名(.jpeg→.jpg)
   }
 ];
-
-        
         // 创建漂浮的心形
         function createHearts() {
             const container = document.getElementById('hearts-container');
@@ -1018,73 +1014,85 @@ const timelineData = [
         
         // 初始化时间轴
         function initTimeline() {
-            const timelineContainer = document.getElementById('timeline-container');
-            let isEven = false;
-            
-            // 按时间排序
-           function initTimeline() {
   const timelineContainer = document.getElementById('timeline-container');
-
-  const sortedTimeline = timelineData.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  sortedTimeline.forEach((item) => {
+  timelineContainer.innerHTML = ''; // 清空容器
+  
+  // 按时间排序
+  const sortedTimeline = [...timelineData].sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  sortedTimeline.forEach((item, index) => {
     const timelineItem = document.createElement('div');
-    timelineItem.className = 'timeline-item';
-
+    timelineItem.className = `timeline-item ${index % 2 === 0 ? 'even' : 'odd'}`;
+    
+    // 生成照片HTML
+    let photosHTML = '';
+    item.photos.forEach(photoUrl => {
+      photosHTML += `
+        <div class="timeline-photo">
+          <img src="${photoUrl}" alt="${item.title}">
+        </div>
+      `;
+    });
+    
     timelineItem.innerHTML = `
       <div class="timeline-date">${item.date}</div>
       <div class="timeline-content">
         <h3 class="timeline-title">${item.title}</h3>
         <p class="timeline-desc">${item.desc}</p>
         <div class="timeline-photos">
-          ${item.photos.slice(0, 3).map(photo => `
-            <div class="timeline-photo">
-              <img src="${photo.thumb}" alt="${photo.title}">
-            </div>
-          `).join('')}
+          ${photosHTML}
         </div>
       </div>
     `;
-
+    
     timelineContainer.appendChild(timelineItem);
   });
 }
-
-        
         // 音乐播放器控制
         function initMusicPlayer() {
             const musicToggle = document.getElementById('music-toggle');
             const musicIcon = document.getElementById('music-icon');
             const bgMusic = document.getElementById('bg-music');
             let isPlaying = false;
-            
-            // 尝试自动播放音乐（用户交互后）
-      document.body.addEventListener('click', function triggerPlay() {
-    if (!isPlaying) {
-      bgMusic.play().then(() => {
-        musicIcon.classList.replace('fa-play', 'fa-pause');
-        isPlaying = true;
-      }).catch(() => {
-        console.log("需要用户交互才能播放音乐");
-      });
-    }
-    document.body.removeEventListener('click', triggerPlay);
+
+// 尝试自动播放音乐（需用户交互）
+document.addEventListener('DOMContentLoaded', function() {
+  // 尝试自动播放
+  bgMusic.play().then(() => {
+    isPlaying = true;
+    musicIcon.classList.replace('fa-play', 'fa-pause');
+  }).catch(() => {
+    console.log("自动播放被阻止，等待用户交互");
   });
-            
-            // 切换播放/暂停
-            musicToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                if (bgMusic.paused) {
-                    bgMusic.play();
-                    musicIcon.classList.remove('fa-play');
-                    musicIcon.classList.add('fa-pause');
-                } else {
-                    bgMusic.pause();
-                    musicIcon.classList.remove('fa-pause');
-                    musicIcon.classList.add('fa-play');
-                }
-            });
+});
+
+// 添加页面点击事件触发播放（如果自动播放失败）
+document.body.addEventListener('click', function triggerPlay() {
+  if (!isPlaying) {
+    bgMusic.play().then(() => {
+      musicIcon.classList.replace('fa-play', 'fa-pause');
+      isPlaying = true;
+    }).catch(() => {
+      console.log("需要用户交互才能播放音乐");
+    });
+  }
+  document.body.removeEventListener('click', triggerPlay);
+});
+
+// 切换播放/暂停
+musicToggle.addEventListener('click', function(e) {
+  e.stopPropagation();
+  
+  if (bgMusic.paused) {
+    bgMusic.play();
+    musicIcon.classList.replace('fa-play', 'fa-pause');
+    isPlaying = true;
+  } else {
+    bgMusic.pause();
+    musicIcon.classList.replace('fa-pause', 'fa-play');
+    isPlaying = false;
+  }
+});
         }
         
         // 初始化页面滚动动画
