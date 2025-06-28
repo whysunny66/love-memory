@@ -660,6 +660,42 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        
+        /* 新增时间轴布局修复 */
+        .timeline-item.left {
+            left: 0;
+            padding-right: 80px;
+            text-align: right;
+        }
+        
+        .timeline-item.right {
+            left: 50%;
+            padding-left: 80px;
+        }
+        
+        .timeline-item.left::before {
+            right: -10px;
+        }
+        
+        .timeline-item.right::before {
+            left: -10px;
+        }
+        
+        @media (max-width: 900px) {
+            .timeline-item.left,
+            .timeline-item.right {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 0;
+                text-align: left;
+                left: 0;
+            }
+            
+            .timeline-item.left::before,
+            .timeline-item.right::before {
+                left: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -803,83 +839,118 @@
 
     <script>
         // 照片数据
-        const photos = [];
-const baseUrl = "https://raw.githubusercontent.com/whysunny66/love-memory/main/1.2.3"; // ← 修改为你的 GitHub Pages 地址
+        const baseUrl = "https://raw.githubusercontent.com/whysunny66/love-memory/main/1.2.3";
+        let photos = [];
 
-async function checkImageExists(url) {
-    return fetch(url, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
-}
-
-async function loadPhotos() {
-    for (let i = 1; i <= 40; i++) {
-        const filename = `1.${i}`;
-        const jpgUrl = `${baseUrl}/${filename}.jpg`;
-        const jpegUrl = `${baseUrl}/${filename}.jpeg`;
-
-        let imageUrl = '';
-        if (await checkImageExists(jpgUrl)) {
-            imageUrl = jpgUrl;
-        } else if (await checkImageExists(jpegUrl)) {
-            imageUrl = jpegUrl;
-        } else {
-            continue; // 如果都不存在，跳过这张
+        // 检查图片是否存在
+        async function checkImageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
         }
 
-        photos.push({
-            id: i,
-            date: `2024-01-${(i % 28 + 1).toString().padStart(2, '0')}`,
-            title: `回忆 ${i}`,
-            desc: `这是我们爱情故事中的第 ${i} 张照片`,
-            thumb: imageUrl,
-            full: imageUrl
-        });
-    }
+        // 加载照片
+        async function loadPhotos() {
+            const photoPromises = [];
+            
+            // 创建1-40的照片加载任务
+            for (let i = 1; i <= 40; i++) {
+                const photoName = `1.${i}`;
+                const jpgUrl = `${baseUrl}/${photoName}.jpg`;
+                const jpegUrl = `${baseUrl}/${photoName}.jpeg`;
+                
+                photoPromises.push(loadPhoto(jpgUrl, jpegUrl, i));
+            }
+            
+            // 等待所有照片加载完成
+            const results = await Promise.all(photoPromises);
+            
+            // 过滤掉加载失败的照片
+            photos = results.filter(photo => photo !== null);
+            
+            // 初始化照片墙
+            initPhotoWall();
+        }
 
-    // 加载完后初始化照片墙
-    initPhotoWall();
-}
+        async function loadPhoto(jpgUrl, jpegUrl, index) {
+            try {
+                // 先尝试加载jpg格式
+                const jpgExists = await checkImageExists(jpgUrl);
+                if (jpgExists) {
+                    return {
+                        id: index,
+                        date: `2024-${Math.floor((index-1)/12)+1}-${(index%12 || 12).toString().padStart(2, '0')}`,
+                        title: `回忆 ${index}`,
+                        desc: `这是我们爱情故事中的第 ${index} 张照片`,
+                        thumb: jpgUrl,
+                        full: jpgUrl
+                    };
+                }
+                
+                // 再尝试加载jpeg格式
+                const jpegExists = await checkImageExists(jpegUrl);
+                if (jpegExists) {
+                    return {
+                        id: index,
+                        date: `2024-${Math.floor((index-1)/12)+1}-${(index%12 || 12).toString().padStart(2, '0')}`,
+                        title: `回忆 ${index}`,
+                        desc: `这是我们爱情故事中的第 ${index} 张照片`,
+                        thumb: jpegUrl,
+                        full: jpegUrl
+                    };
+                }
+                
+                console.warn(`照片 1.${index} 不存在 (jpg 和 jpeg 格式都不存在)`);
+                return null;
+            } catch (error) {
+                console.error(`加载照片 1.${index} 时出错:`, error);
+                return null;
+            }
+        }
 
-        
         // 时间轴数据
-        const baseUrl = "https://raw.githubusercontent.com/whysunny66/love-memory/main/1.2.3";
-const timelineData = [
-  {
-    date: "2024-03-09",
-    title: "第一次合影",
-    desc: "那天阳光明媚，我们第一次并肩留下影像，从此彼此的故事开始了。",
-    photos: [`${baseUrl}/2.1.jpeg`]  // 修正扩展名(.jpeg→.jpg)
-  },
-  {
-    date: "2024-03-12",
-    title: "第一次做的戒指",
-    desc: "我们亲手为彼此制作了戒指，那是一种承诺的象征。",
-    photos: [`${baseUrl}/2.2.jpeg`]
-  },
-  {
-    date: "2024-03-16",
-    title: "第一次约会",
-    desc: "第一次正式约会，羞涩却满怀期待，我们的笑容定格在那天的街头。",
-    photos: [`${baseUrl}/2.3.jpeg`]  // 修正扩展名(.jpeg→.jpg)
-  },
-  {
-    date: "2024-03-30",
-    title: "第一次旅游 · 正定",
-    desc: "古城正定，我们一起感受古韵与风光，每一步都印着欢笑。",
-    photos: [`${baseUrl}/2.4.jpeg`]  // 修正扩展名(.jpeg→.jpg)
-  },
-  {
-    date: "2024-06-08",
-    title: "第一次游乐场",
-    desc: "在旋转木马上欢笑，在过山车上尖叫，我们的快乐如同夏天一样炙热。",
-    photos: [`${baseUrl}/2.5.jpeg`]  // 修正扩展名(.jpeg→.jpg)
-  },
-  {
-    date: "2025-04-14",
-    title: "第一次写真",
-    desc: "第一次写真记录下我们最自然的一面，那一刻的眼神中藏着彼此。",
-    photos: [`${baseUrl}/2.6.jpeg`]  // 修正扩展名(.jpeg→.jpg)
-  }
-];
+        const timelineData = [
+            {
+                date: "2024-03-09",
+                title: "第一次合影",
+                desc: "那天阳光明媚，我们第一次并肩留下影像，从此彼此的故事开始了。",
+                photos: [`${baseUrl}/2.1.jpg`, `${baseUrl}/2.1.jpeg`]
+            },
+            {
+                date: "2024-03-12",
+                title: "第一次做的戒指",
+                desc: "我们亲手为彼此制作了戒指，那是一种承诺的象征。",
+                photos: [`${baseUrl}/2.2.jpg`, `${baseUrl}/2.2.jpeg`]
+            },
+            {
+                date: "2024-03-16",
+                title: "第一次约会",
+                desc: "第一次正式约会，羞涩却满怀期待，我们的笑容定格在那天的街头。",
+                photos: [`${baseUrl}/2.3.jpg`, `${baseUrl}/2.3.jpeg`]
+            },
+            {
+                date: "2024-03-30",
+                title: "第一次旅游 · 正定",
+                desc: "古城正定，我们一起感受古韵与风光，每一步都印着欢笑。",
+                photos: [`${baseUrl}/2.4.jpg`, `${baseUrl}/2.4.jpeg`]
+            },
+            {
+                date: "2024-06-08",
+                title: "第一次游乐场",
+                desc: "在旋转木马上欢笑，在过山车上尖叫，我们的快乐如同夏天一样炙热。",
+                photos: [`${baseUrl}/2.5.jpg`, `${baseUrl}/2.5.jpeg`]
+            },
+            {
+                date: "2025-04-14",
+                title: "第一次写真",
+                desc: "第一次写真记录下我们最自然的一面，那一刻的眼神中藏着彼此。",
+                photos: [`${baseUrl}/2.6.jpg`, `${baseUrl}/2.6.jpeg`]
+            }
+        ];
+
         // 创建漂浮的心形
         function createHearts() {
             const container = document.getElementById('hearts-container');
@@ -937,20 +1008,21 @@ const timelineData = [
         function initPhotoWall() {
             const photoGrid = document.getElementById('photo-grid');
             const mainPhoto = document.getElementById('main-photo');
+            const photoInfo = mainPhoto.nextElementSibling;
             let currentIndex = 0;
             let autoRotate;
+            
+            // 清空网格
+            photoGrid.innerHTML = '';
             
             // 添加照片到网格
             photos.forEach((photo, index) => {
                 const gridItem = document.createElement('div');
                 gridItem.className = 'grid-item' + (index === 0 ? ' active' : '');
                 gridItem.dataset.index = index;
-                gridItem.dataset.src = photo.full;
-                gridItem.dataset.date = photo.date;
-                gridItem.dataset.desc = photo.desc;
                 
                 gridItem.innerHTML = `
-                    <img src="${photo.thumb}" alt="照片${index + 1}">
+                    <img src="${photo.thumb}" alt="照片${index + 1}" loading="lazy">
                     <div class="photo-info">
                         <div class="photo-date"><i class="fas fa-calendar-day"></i> ${photo.date}</div>
                     </div>
@@ -961,7 +1033,6 @@ const timelineData = [
                     mainPhoto.src = photo.full;
                     
                     // 更新照片信息
-                    const photoInfo = mainPhoto.nextElementSibling;
                     photoInfo.querySelector('.photo-date').innerHTML = `<i class="fas fa-calendar-day"></i> ${photo.date}`;
                     photoInfo.querySelector('p').textContent = photo.desc;
                     
@@ -982,19 +1053,25 @@ const timelineData = [
                 photoGrid.appendChild(gridItem);
             });
             
+            // 设置第一张照片为主照片
+            if (photos.length > 0) {
+                mainPhoto.src = photos[0].full;
+                photoInfo.querySelector('.photo-date').innerHTML = `<i class="fas fa-calendar-day"></i> ${photos[0].date}`;
+                photoInfo.querySelector('p').textContent = photos[0].desc;
+            }
+            
             // 启动自动轮播
             function startAutoRotate() {
+                if (photos.length === 0) return;
+                
                 autoRotate = setInterval(() => {
                     currentIndex = (currentIndex + 1) % photos.length;
-                    
-                    // 获取对应的照片数据
                     const photo = photos[currentIndex];
                     
                     // 更新主照片
                     mainPhoto.src = photo.full;
                     
                     // 更新照片信息
-                    const photoInfo = mainPhoto.nextElementSibling;
                     photoInfo.querySelector('.photo-date').innerHTML = `<i class="fas fa-calendar-day"></i> ${photo.date}`;
                     photoInfo.querySelector('p').textContent = photo.desc;
                     
@@ -1002,52 +1079,60 @@ const timelineData = [
                     document.querySelectorAll('.grid-item').forEach(item => {
                         item.classList.remove('active');
                     });
-                    document.querySelectorAll('.grid-item')[currentIndex].classList.add('active');
-                    
-                    // 已移除滚动到可见区域的代码
+                    if (document.querySelectorAll('.grid-item')[currentIndex]) {
+                        document.querySelectorAll('.grid-item')[currentIndex].classList.add('active');
+                    }
                 }, 5000); // 每5秒切换一次
             }
             
-            // 初始启动轮播
             startAutoRotate();
         }
         
         // 初始化时间轴
         function initTimeline() {
-  const timelineContainer = document.getElementById('timeline-container');
-  timelineContainer.innerHTML = ''; // 清空容器
-  
-  // 按时间排序
-  const sortedTimeline = [...timelineData].sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  sortedTimeline.forEach((item, index) => {
-    const timelineItem = document.createElement('div');
-    timelineItem.className = `timeline-item ${index % 2 === 0 ? 'even' : 'odd'}`;
-    
-    // 生成照片HTML
-    let photosHTML = '';
-    item.photos.forEach(photoUrl => {
-      photosHTML += `
-        <div class="timeline-photo">
-          <img src="${photoUrl}" alt="${item.title}">
-        </div>
-      `;
-    });
-    
-    timelineItem.innerHTML = `
-      <div class="timeline-date">${item.date}</div>
-      <div class="timeline-content">
-        <h3 class="timeline-title">${item.title}</h3>
-        <p class="timeline-desc">${item.desc}</p>
-        <div class="timeline-photos">
-          ${photosHTML}
-        </div>
-      </div>
-    `;
-    
-    timelineContainer.appendChild(timelineItem);
-  });
-}
+            const timelineContainer = document.getElementById('timeline-container');
+            timelineContainer.innerHTML = ''; // 清空容器
+            
+            // 按时间排序
+            const sortedTimeline = [...timelineData].sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            sortedTimeline.forEach((item, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                
+                // 添加左右布局类
+                if (index % 2 === 0) {
+                    timelineItem.classList.add('left');
+                } else {
+                    timelineItem.classList.add('right');
+                }
+                
+                // 生成照片HTML - 只显示第一张存在的照片
+                let photoHTML = '';
+                for (const photoUrl of item.photos) {
+                    photoHTML = `
+                        <div class="timeline-photo">
+                            <img src="${photoUrl}" alt="${item.title}" loading="lazy">
+                        </div>
+                    `;
+                    break; // 只显示一张照片
+                }
+                
+                timelineItem.innerHTML = `
+                    <div class="timeline-date">${item.date}</div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">${item.title}</h3>
+                        <p class="timeline-desc">${item.desc}</p>
+                        <div class="timeline-photos">
+                            ${photoHTML}
+                        </div>
+                    </div>
+                `;
+                
+                timelineContainer.appendChild(timelineItem);
+            });
+        }
+        
         // 音乐播放器控制
         function initMusicPlayer() {
             const musicToggle = document.getElementById('music-toggle');
@@ -1055,44 +1140,44 @@ const timelineData = [
             const bgMusic = document.getElementById('bg-music');
             let isPlaying = false;
 
-// 尝试自动播放音乐（需用户交互）
-document.addEventListener('DOMContentLoaded', function() {
-  // 尝试自动播放
-  bgMusic.play().then(() => {
-    isPlaying = true;
-    musicIcon.classList.replace('fa-play', 'fa-pause');
-  }).catch(() => {
-    console.log("自动播放被阻止，等待用户交互");
-  });
-});
+            // 尝试自动播放音乐
+            document.addEventListener('DOMContentLoaded', function() {
+                // 尝试自动播放
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    musicIcon.classList.replace('fa-play', 'fa-pause');
+                }).catch(() => {
+                    console.log("自动播放被阻止，等待用户交互");
+                });
+            });
 
-// 添加页面点击事件触发播放（如果自动播放失败）
-document.body.addEventListener('click', function triggerPlay() {
-  if (!isPlaying) {
-    bgMusic.play().then(() => {
-      musicIcon.classList.replace('fa-play', 'fa-pause');
-      isPlaying = true;
-    }).catch(() => {
-      console.log("需要用户交互才能播放音乐");
-    });
-  }
-  document.body.removeEventListener('click', triggerPlay);
-});
+            // 添加页面点击事件触发播放（如果自动播放失败）
+            document.body.addEventListener('click', function triggerPlay() {
+                if (!isPlaying) {
+                    bgMusic.play().then(() => {
+                        musicIcon.classList.replace('fa-play', 'fa-pause');
+                        isPlaying = true;
+                    }).catch(() => {
+                        console.log("需要用户交互才能播放音乐");
+                    });
+                }
+                document.body.removeEventListener('click', triggerPlay);
+            });
 
-// 切换播放/暂停
-musicToggle.addEventListener('click', function(e) {
-  e.stopPropagation();
-  
-  if (bgMusic.paused) {
-    bgMusic.play();
-    musicIcon.classList.replace('fa-play', 'fa-pause');
-    isPlaying = true;
-  } else {
-    bgMusic.pause();
-    musicIcon.classList.replace('fa-pause', 'fa-play');
-    isPlaying = false;
-  }
-});
+            // 切换播放/暂停
+            musicToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    musicIcon.classList.replace('fa-play', 'fa-pause');
+                    isPlaying = true;
+                } else {
+                    bgMusic.pause();
+                    musicIcon.classList.replace('fa-pause', 'fa-play');
+                    isPlaying = false;
+                }
+            });
         }
         
         // 初始化页面滚动动画
@@ -1120,14 +1205,13 @@ musicToggle.addEventListener('click', function(e) {
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
             createHearts();
+            updateLoveTimer(); // 立即更新一次
             setInterval(updateLoveTimer, 1000); // 每秒更新一次
             
-            updateLoveTimer(); // 立即更新一次
-            loadPhotos(); 
+            loadPhotos(); // 加载照片并初始化照片墙
             initTimeline();
             initMusicPlayer();
             initScrollAnimations();
-            initPhotoWall();
         });
     </script>
 </body>
