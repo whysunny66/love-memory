@@ -804,35 +804,85 @@
     <script>
         // 照片数据 - 这里模拟50张照片
         const photos = [];
-        for (let i = 1; i <= 50; i++) {
-            const year = 2023 + Math.floor((i-1)/12);
-            const month = (i % 12) || 12;
-            const day = Math.floor(Math.random() * 28) + 1;
-            
-            photos.push({
-                id: i,
-                date: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
-                title: `美好时刻 #${i}`,
-                desc: `这是我们爱情故事中的第${i}个珍贵瞬间，记录着我们的欢笑与幸福`,
-                thumb: `https://picsum.photos/200/200?random=${i}`,
-                full: `https://picsum.photos/1200/800?random=${i}`
-            });
+const baseUrl = "https://github.com/whysunny66/love-memory/tree/main/1.2.3"; // ← 修改为你的 GitHub Pages 地址
+
+async function checkImageExists(url) {
+    return fetch(url, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
+}
+
+async function loadPhotos() {
+    for (let i = 1; i <= 40; i++) {
+        const filename = `1.${i}`;
+        const jpgUrl = `${baseUrl}/${filename}.jpg`;
+        const jpegUrl = `${baseUrl}/${filename}.jpeg`;
+
+        let imageUrl = '';
+        if (await checkImageExists(jpgUrl)) {
+            imageUrl = jpgUrl;
+        } else if (await checkImageExists(jpegUrl)) {
+            imageUrl = jpegUrl;
+        } else {
+            continue; // 如果都不存在，跳过这张
         }
-        
-        // 时间轴数据 - 按时间分组
-        const timelineData = {};
-        photos.forEach(photo => {
-            const yearMonth = photo.date.substring(0, 7);
-            if (!timelineData[yearMonth]) {
-                timelineData[yearMonth] = {
-                    date: yearMonth,
-                    title: `${yearMonth} 的回忆`,
-                    photos: [],
-                    desc: `在${yearMonth}，我们共同创造了${Math.floor(Math.random() * 5) + 3}个美好回忆`
-                };
-            }
-            timelineData[yearMonth].photos.push(photo);
+
+        photos.push({
+            id: i,
+            date: `2024-01-${(i % 28 + 1).toString().padStart(2, '0')}`,
+            title: `回忆 ${i}`,
+            desc: `这是我们爱情故事中的第 ${i} 张照片`,
+            thumb: imageUrl,
+            full: imageUrl
         });
+    }
+
+    // 加载完后初始化照片墙
+    initPhotoWall();
+    initTimeline();
+}
+
+        
+        // 时间轴数据
+        const baseUrl = "https://github.com/whysunny66/love-memory/tree/main/1.2.3";
+
+const timelineData = [
+  {
+    date: "2024-03-09",
+    title: "第一次合影",
+    desc: "那天阳光明媚，我们第一次并肩留下影像，从此彼此的故事开始了。",
+    photos: [`${baseUrl}/2.1.jpg`]
+  },
+  {
+    date: "2024-03-12",
+    title: "第一次做的戒指",
+    desc: "我们亲手为彼此制作了戒指，那是一种承诺的象征。",
+    photos: [`${baseUrl}/2.2.jpg`]
+  },
+  {
+    date: "2024-03-16",
+    title: "第一次约会",
+    desc: "第一次正式约会，羞涩却满怀期待，我们的笑容定格在那天的街头。",
+    photos: [`${baseUrl}/2.3.jpg`]
+  },
+  {
+    date: "2024-03-30",
+    title: "第一次旅游 · 正定",
+    desc: "古城正定，我们一起感受古韵与风光，每一步都印着欢笑。",
+    photos: [`${baseUrl}/2.4.jpg`]
+  },
+  {
+    date: "2024-06-08",
+    title: "第一次游乐场",
+    desc: "在旋转木马上欢笑，在过山车上尖叫，我们的快乐如同夏天一样炙热。",
+    photos: [`${baseUrl}/2.5.jpg`]
+  },
+      {
+    date: "2025-04-14",
+    title: "第一次写真",
+    desc: "第一次写真记录下我们最自然的一面，那一刻的眼神中藏着彼此。",
+    photos: [`${baseUrl}/2.6.jpg`]
+  }
+];
+
         
         // 创建漂浮的心形
         function createHearts() {
@@ -972,32 +1022,34 @@
             let isEven = false;
             
             // 按时间排序
-            const sortedTimeline = Object.values(timelineData).sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
-            });
-            
-            sortedTimeline.forEach((item, index) => {
-                const timelineItem = document.createElement('div');
-                timelineItem.className = 'timeline-item';
-                
-                timelineItem.innerHTML = `
-                    <div class="timeline-date">${item.date}</div>
-                    <div class="timeline-content">
-                        <h3 class="timeline-title">${item.title}</h3>
-                        <p class="timeline-desc">${item.desc}</p>
-                        <div class="timeline-photos">
-                            ${item.photos.slice(0, 3).map(photo => `
-                                <div class="timeline-photo">
-                                    <img src="${photo.thumb}" alt="${photo.title}">
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                timelineContainer.appendChild(timelineItem);
-            });
-        }
+           function initTimeline() {
+  const timelineContainer = document.getElementById('timeline-container');
+
+  const sortedTimeline = timelineData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  sortedTimeline.forEach((item) => {
+    const timelineItem = document.createElement('div');
+    timelineItem.className = 'timeline-item';
+
+    timelineItem.innerHTML = `
+      <div class="timeline-date">${item.date}</div>
+      <div class="timeline-content">
+        <h3 class="timeline-title">${item.title}</h3>
+        <p class="timeline-desc">${item.desc}</p>
+        <div class="timeline-photos">
+          ${item.photos.slice(0, 3).map(photo => `
+            <div class="timeline-photo">
+              <img src="${photo.thumb}" alt="${photo.title}">
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    timelineContainer.appendChild(timelineItem);
+  });
+}
+
         
         // 音乐播放器控制
         function initMusicPlayer() {
@@ -1060,12 +1112,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             createHearts();
             setInterval(updateLoveTimer, 1000); // 每秒更新一次
-            updateLoveTimer(); // 立即更新一次
             
-            initPhotoWall();
+            updateLoveTimer(); // 立即更新一次
+            loadPhotos(); 
             initTimeline();
             initMusicPlayer();
             initScrollAnimations();
+            initPhotoWall();
         });
     </script>
 </body>
