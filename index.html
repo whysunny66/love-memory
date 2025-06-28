@@ -667,7 +667,7 @@
     
     <!-- 音乐播放器 -->
     <audio id="bg-music" loop>
-        <source src="music.mp3" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/whysunny66/love-memory/main/music.mp3" type="audio/mpeg">
     </audio>
     <div class="music-player" id="music-toggle">
         <i class="fas fa-play" id="music-icon"></i>
@@ -751,7 +751,7 @@
             <div class="places-container">
                 <!-- 北京 -->
                 <div class="place-card">
-                    <img src="https://github.com/whysunny66/love-memory/blob/main/1.2.3/3.2.jpeg" 
+                    <img src="https://github.com/whysunny66/love-memory/main/1.2.3/3.2.jpeg" 
                          alt="北京天安门" class="place-image">
                     <div class="place-overlay">
                         <h3 class="place-name">北京 · 天安门</h3>
@@ -762,7 +762,7 @@
                 
                 <!-- 天津 -->
                 <div class="place-card">
-                    <img src="https://github.com/whysunny66/love-memory/blob/main/1.2.3/3.3.jpeg" 
+                    <img src="https://github.com/whysunny66/love-memory/main/1.2.3/3.3.jpeg" 
                          alt="天津" class="place-image">
                     <div class="place-overlay">
                         <h3 class="place-name">天津</h3>
@@ -773,7 +773,7 @@
                 
                 <!-- 云南 -->
                 <div class="place-card">
-                    <img src="https://github.com/whysunny66/love-memory/blob/main/1.2.3/3.5.jpeg" 
+                    <img src="https://github.com/whysunny66/love-memory/main/1.2.3/3.5.jpeg" 
                          alt="云南" class="place-image">
                     <div class="place-overlay">
                         <h3 class="place-name">云南</h3>
@@ -784,7 +784,7 @@
                 
                 <!-- 洱海 -->
                 <div class="place-card">
-                    <img src="https://github.com/whysunny66/love-memory/blob/main/1.2.3/3.6.jpg" 
+                    <img src="https://github.com/whysunny66/love-memory/main/1.2.3/3.6.jpg" 
                          alt="洱海风光" class="place-image">
                     <div class="place-overlay">
                         <h3 class="place-name">洱海</h3>
@@ -804,7 +804,7 @@
     <script>
         // 照片数据 - 这里模拟50张照片
         const photos = [];
-const baseUrl = "https://github.com/whysunny66/love-memory/tree/main/1.2.3"; // ← 修改为你的 GitHub Pages 地址
+const baseUrl = "https://raw.githubusercontent.com/whysunny66/love-memory/main/1.2.3"; // ← 修改为你的 GitHub Pages 地址
 
 async function checkImageExists(url) {
     return fetch(url, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
@@ -849,7 +849,7 @@ const timelineData = [
     date: "2024-03-09",
     title: "第一次合影",
     desc: "那天阳光明媚，我们第一次并肩留下影像，从此彼此的故事开始了。",
-    photos: [`${baseUrl}/2.1.jpg`]
+    photos: [`${baseUrl}/2.1.jpeg`]
   },
   {
     date: "2024-03-12",
@@ -861,25 +861,25 @@ const timelineData = [
     date: "2024-03-16",
     title: "第一次约会",
     desc: "第一次正式约会，羞涩却满怀期待，我们的笑容定格在那天的街头。",
-    photos: [`${baseUrl}/2.3.jpg`]
+    photos: [`${baseUrl}/2.3.jpeg`]
   },
   {
     date: "2024-03-30",
     title: "第一次旅游 · 正定",
     desc: "古城正定，我们一起感受古韵与风光，每一步都印着欢笑。",
-    photos: [`${baseUrl}/2.4.jpg`]
+    photos: [`${baseUrl}/2.4.jpeg`]
   },
   {
     date: "2024-06-08",
     title: "第一次游乐场",
     desc: "在旋转木马上欢笑，在过山车上尖叫，我们的快乐如同夏天一样炙热。",
-    photos: [`${baseUrl}/2.5.jpg`]
+    photos: [`${baseUrl}/2.5.jpeg`]
   },
       {
     date: "2025-04-14",
     title: "第一次写真",
     desc: "第一次写真记录下我们最自然的一面，那一刻的眼神中藏着彼此。",
-    photos: [`${baseUrl}/2.6.jpg`]
+    photos: [`${baseUrl}/2.6.jpeg`]
   }
 ];
 
